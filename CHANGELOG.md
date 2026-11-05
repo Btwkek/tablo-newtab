@@ -2,6 +2,14 @@
 
 **English** · [Русский](CHANGELOG.ru.md)
 
+## 2.1.1
+
+- New extension icon: a heart on a purple-to-pink gradient.
+
+## 2.1.1
+
+- New extension icon: a heart on a gradient.
+
 ## 2.1.0
 
 - Added English. The language follows the browser by default and can be changed in Settings → Language.

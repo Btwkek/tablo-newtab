@@ -1,6 +1,6 @@
 {
   "name": "tablo-newtab",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Новая вкладка для Firefox: часы, поиск, плитки, папки и настраиваемый фон",
   "private": true,
   "license": "MIT",
