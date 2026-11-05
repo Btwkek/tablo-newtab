@@ -13,8 +13,9 @@ import { clearWidgets, openAddWidget, syncWidgets } from './widgets.js';
 import { closeSettings, initSettings, openSettings } from './settings.js';
 import { initBookmarks, requestBookmarkAccess } from './bookmarks.js';
 import { initDataIo, openDataDialog } from './dataio.js';
-import { hideMenu, showMenu } from './ui.js';
+import { hideMenu, showMenu, toast } from './ui.js';
 import { setLanguage, t, translateDom } from './i18n.js';
+import { iconAccessGranted, refreshIconAccess, requestIconAccess, forgetEstimates } from './tilecolor.js';
 import { $ } from './util.js';
 
 /** Показывает и скрывает блоки согласно настройкам. */
@@ -52,9 +53,15 @@ function openMainMenu(event) {
     [t('menu.changeBg'), () => $('#background-file').click()],
     [t('menu.resetBg'), () => { S.bg = null; save(); render(); }],
     [t('menu.importBookmarks'), requestBookmarkAccess],
+    ...(S.opts.colorTiles && !iconAccessGranted ? [[t('menu.iconAccess'), allowIconAccess]] : []),
     [t('menu.data'), openDataDialog],
     [t('menu.settings'), openSettings]
   ]);
+}
+
+async function allowIconAccess() {
+  if (await requestIconAccess()) { forgetEstimates(); render(); }
+  else toast(t('colorTiles.denied'));
 }
 
 function chooseBackground(event) {
@@ -71,6 +78,7 @@ function chooseBackground(event) {
 async function start() {
   const existed = await loadState();
   if (!existed) await save();
+  await refreshIconAccess();
 
   on('render', render);
   on('weather:refresh', () => updateWeather(true));

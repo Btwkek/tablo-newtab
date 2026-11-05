@@ -75,8 +75,26 @@
     <label><span data-i18n="html.siteName"></span> <input id="site-title"></label>
     <div id="site-fields">
       <label><span data-i18n="html.siteUrl"></span> <input id="site-url" placeholder="https://"></label>
-      <label><span data-i18n="html.siteColor"></span> <input type="color" id="site-color" value="#ffffff"></label>
       <label><span data-i18n="html.siteIcon"></span> <input type="file" id="site-icon" accept="image/*"></label>
+    </div>
+    <div id="fill-fields">
+      <label><span data-i18n="html.fillMode"></span>
+        <select id="site-fill-mode">
+          <option value="default" data-i18n="fill.default"></option>
+          <option value="icon" data-i18n="fill.icon"></option>
+          <option value="color" data-i18n="fill.color"></option>
+          <option value="none" data-i18n="fill.none"></option>
+        </select>
+      </label>
+      <label id="fill-color-row"><span data-i18n="html.siteColor"></span> <input type="color" id="site-color" value="#4a6cf7"> <button type="button" id="site-eyedropper" data-i18n="html.eyedropper"></button></label>
+      <label id="fill-strength-row"><span data-i18n="html.fillStrength"></span> <input type="range" id="site-fill-strength" min="20" max="100" step="5" value="100"></label>
+      <label id="fill-gradient-row"><span data-i18n="html.fillGradient"></span>
+        <select id="site-fill-gradient">
+          <option value="default" data-i18n="fill.default"></option>
+          <option value="on" data-i18n="fill.on"></option>
+          <option value="off" data-i18n="fill.off"></option>
+        </select>
+      </label>
     </div>
     <div id="folder-fields">
       <label><span data-i18n="html.folderBlur"></span> <input type="range" id="folder-blur" min="0" max="14" value="0"></label>

@@ -329,6 +329,7 @@ main {
   font-size: 12px;
 }
 .tile.light-text span { color: #fff; }
+.tile.dark-text span { color: #1e1b24; }
 body.no-labels .tile:not(.folder) span { display: none; }
 
 /* Свободная ячейка: тёмная и неприметная, подсвечивается только при переносе */

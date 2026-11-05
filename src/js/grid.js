@@ -3,7 +3,8 @@
 import { S, save } from './state.js';
 import { emit } from './events.js';
 import { t } from './i18n.js';
-import { editSite, iconElement, openSite, showSiteMenu } from './sites.js';
+import { editSite, fillModeOf, iconElement, openSite, showSiteMenu } from './sites.js';
+import { cachedTileColor, tileColor, tileStyle } from './tilecolor.js';
 import { $, svgDataUri, uid } from './util.js';
 
 const FOLDER_ICON = svgDataUri(
@@ -129,6 +130,31 @@ function buildFolderPreview(folder) {
   return preview;
 }
 
+/** Красит плитку по цвету значка; пока цвет считается, остаётся обычная. */
+function paintTile(element, item) {
+  const apply = entry => {
+    const tile = tileStyle(
+      entry,
+      item.fillStrength ?? S.opts.colorTilesStrength,
+      item.gradient ?? S.opts.colorTilesGradient
+    );
+    element.style.background = tile.bg;
+    element.classList.add('colored', tile.light ? 'light-text' : 'dark-text');
+  };
+  const ready = cachedTileColor(item);
+  if (ready) apply(ready);
+  else tileColor(item).then(apply);
+}
+
+function applyFill(element, item) {
+  const mode = fillModeOf(item);
+  if (mode === 'color') {
+    if (item.bg) element.style.background = item.bg;
+  } else if (mode === 'icon' || (mode === 'default' && S.opts.colorTiles)) {
+    paintTile(element, item);
+  }
+}
+
 function tileElement(item, list) {
   const isFolder = item.type === 'folder';
   const element = document.createElement('div');
@@ -151,7 +177,7 @@ function tileElement(item, list) {
       element.style.setProperty('--folder-blur', item.blur + 'px');
     }
   } else {
-    if (item.bg) element.style.background = item.bg;
+    applyFill(element, item);
     element.append(iconElement(item));
     if (!item.wide) {
       const label = document.createElement('span');

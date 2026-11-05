@@ -6,6 +6,8 @@ import { emit, on } from './events.js';
 import { importNow, rebuildMirror } from './bookmarks.js';
 import { openDataDialog } from './dataio.js';
 import { t } from './i18n.js';
+import { forgetEstimates, requestIconAccess } from './tilecolor.js';
+import { toast } from './ui.js';
 import { $, h, sameJson } from './util.js';
 
 /* ---- Описание полей ---- */
@@ -69,6 +71,9 @@ const SECTIONS = [
     range('tileRadius', 0, 32),
     range('tileGap', 0, 24),
     range('contentWidth', 480, 1200, 20),
+    check('colorTiles'),
+    range('colorTilesStrength', 20, 100, 5),
+    check('colorTilesGradient'),
     check('showLabels'),
     check('showFolderIcons'),
     check('openInNewTab')
@@ -88,6 +93,11 @@ const AFTER_CHANGE = {
   bookmarkSource: () => importNow(),
   mirrorBookmarks: () => { if (S.opts.mirrorBookmarks) rebuildMirror(); },
   language: () => { emit('language'); reopenSettings(); },
+  colorTiles: async () => {
+    if (!S.opts.colorTiles) return;
+    if (await requestIconAccess()) { forgetEstimates(); emit('render'); }
+    else toast(t('colorTiles.denied'));
+  },
   city: () => emit('weather:refresh'),
   showWeather: () => emit('weather:refresh')
 };

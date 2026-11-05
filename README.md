@@ -16,6 +16,7 @@ The interface is available in **English** and **Russian**. It follows the browse
 - Widgets: note, to-do list, countdown, timer.
 - Export and import of settings as JSON.
 - English and Russian interface.
+- Tile fill from the site icon color: adjustable strength, optional gradient, per-tile modes.
 
 ## Installation
 

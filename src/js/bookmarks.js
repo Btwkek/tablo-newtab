@@ -15,7 +15,7 @@ const ROOTS = {
 
 const isMirrorFolder = node => node.type === 'folder' && MIRROR_FOLDER_NAMES.includes(node.title);
 const isSite = node => node.type === 'bookmark' && /^https?:/.test(node.url || '');
-const siteFrom = node => ({ id: uid(), type: 'site', title: node.title, url: node.url });
+const siteFrom = node => ({ id: uid(), type: 'site', title: node.title, url: node.url, src: node.url });
 
 /* ---- Импорт ---- */
 
@@ -44,8 +44,10 @@ export async function importBookmarks() {
   const hidden = new Set(S.hidden ?? []);
   const known = new Set();
   for (const tile of S.tiles) {
-    if (tile.url) known.add(tile.url);
-    for (const child of tile.items ?? []) known.add(child.url);
+    for (const site of [tile, ...(tile.items ?? [])]) {
+      if (site.url) known.add(site.url);
+      if (site.src) known.add(site.src);
+    }
   }
   const isNew = node => isSite(node) && !known.has(node.url) && !hidden.has(node.url);
 
@@ -109,7 +111,8 @@ function watchBookmarks() {
 let mirrorSignature = '';
 
 const mirrorSoon = debounce(async () => {
-  if (!S.opts.mirrorBookmarks || !S.tiles.length || !hasBookmarksApi()) return;
+  // Пустой список не трогаем только на первом запуске: после удаления последней плитки зеркало нужно очистить.
+  if (!S.opts.mirrorBookmarks || !hasBookmarksApi() || (!S.tiles.length && !S.hidden?.length)) return;
 
   const ordered = [...S.tiles].sort((a, b) => (a.slot ?? 1e9) - (b.slot ?? 1e9));
   const signature = JSON.stringify(

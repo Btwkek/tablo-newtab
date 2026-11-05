@@ -4,6 +4,7 @@ import { S, save } from './state.js';
 import { emit } from './events.js';
 import { showMenu, toast } from './ui.js';
 import { t } from './i18n.js';
+import { pickColor } from './eyedropper.js';
 import { $, hostOf, isSafeUrl, normalizeUrl, uid } from './util.js';
 
 /* ---- Значки ---- */
@@ -38,8 +39,10 @@ export function openSite(url, event) {
 
 /** Запоминает адреса удалённой плитки, чтобы закладки не вернули её обратно. */
 function hideUrls(item) {
-  const urls = item.type === 'folder' ? item.items.map(i => i.url) : [item.url];
-  S.hidden = (S.hidden || []).concat(urls);
+  const sites = item.type === 'folder' ? item.items : [item];
+  // src — адрес исходной закладки: его могли поправить в диалоге правки, а закладка осталась прежней.
+  const urls = sites.flatMap(site => [site.url, site.src]).filter(Boolean);
+  S.hidden = [...new Set([...(S.hidden || []), ...urls])];
 }
 
 export function siteMenu(item, list) {
@@ -48,6 +51,11 @@ export function siteMenu(item, list) {
     [t('item.delete'), () => {
       if (list !== S.pills) hideUrls(item);
       list.splice(list.indexOf(item), 1);
+      // Из папки убрали последний сайт: пустая папка не нужна (и не должна жить в зеркале).
+      if (list !== S.tiles && list !== S.pills && !list.length) {
+        const folder = S.tiles.find(tile => tile.items === list);
+        if (folder) S.tiles.splice(S.tiles.indexOf(folder), 1);
+      }
       save();
       emit('render');
     }]
@@ -63,8 +71,49 @@ export function showSiteMenu(event, item, list) {
 
 /* ---- Диалог добавления и изменения ---- */
 
+/** Режим заливки плитки: default (как в настройках), icon, color (свой цвет) или none. */
+export const fillModeOf = item => item.fillMode || (item.bg ? 'color' : 'default');
+
 let pickedIcon = null;
 let colorTouched = false;
+let strengthTouched = false;
+
+/** Показывает только те поля заливки, которые нужны выбранному режиму. */
+function syncFillRows() {
+  const mode = $('#site-fill-mode').value;
+  const auto = mode === 'default' || mode === 'icon';
+  $('#fill-color-row').style.display = mode === 'color' ? '' : 'none';
+  $('#fill-strength-row').style.display = auto ? '' : 'none';
+  $('#fill-gradient-row').style.display = auto ? '' : 'none';
+}
+
+/** Переносит выбранные в диалоге параметры заливки в плитку. */
+function saveFill(item) {
+  const mode = $('#site-fill-mode').value;
+  if (mode === 'default') delete item.fillMode;
+  else item.fillMode = mode;
+
+  if (mode === 'color') {
+    if (colorTouched || !item.bg) { item.bg = $('#site-color').value; item.dark = false; }
+  } else {
+    delete item.bg;
+    delete item.dark;
+  }
+
+  if (mode === 'default' || mode === 'icon') {
+    if (strengthTouched) {
+      const strength = Number($('#site-fill-strength').value);
+      if (strength === S.opts.colorTilesStrength) delete item.fillStrength;
+      else item.fillStrength = strength;
+    }
+    const gradient = $('#site-fill-gradient').value;
+    if (gradient === 'default') delete item.gradient;
+    else item.gradient = gradient === 'on';
+  } else {
+    delete item.fillStrength;
+    delete item.gradient;
+  }
+}
 
 /** Открывает диалог для сайта или папки. isNew — добавить новый элемент в list. */
 export function editSite(item, list, isNew) {
@@ -77,14 +126,32 @@ export function editSite(item, list, isNew) {
   $('#folder-blur').value = item.blur || 0;
   $('#site-title').value = item.title || '';
   $('#site-url').value = item.url || '';
-  $('#site-color').value = item.bg?.[0] === '#' ? item.bg : '#ffffff';
+  $('#fill-fields').style.display = isFolder || list === S.pills ? 'none' : '';
+  $('#site-fill-mode').value = fillModeOf(item);
+  $('#site-color').value = item.bg?.[0] === '#' ? item.bg : '#4a6cf7';
+  $('#site-fill-strength').value = item.fillStrength ?? S.opts.colorTilesStrength;
+  $('#site-fill-gradient').value = item.gradient === true ? 'on' : item.gradient === false ? 'off' : 'default';
   $('#site-icon').value = '';
   pickedIcon = null;
   colorTouched = false;
+  strengthTouched = false;
+  syncFillRows();
   dialog.showModal();
 
   $('#site-cancel').onclick = () => dialog.close();
   $('#site-color').oninput = () => { colorTouched = true; };
+  $('#site-fill-strength').oninput = () => { strengthTouched = true; };
+  $('#site-fill-mode').onchange = syncFillRows;
+  $('#site-eyedropper').onclick = async () => {
+    dialog.close(); // окно не должно закрывать то, с чего берётся цвет
+    const color = await pickColor();
+    dialog.showModal();
+    if (!color) return;
+    $('#site-color').value = color;
+    colorTouched = true;
+    $('#site-fill-mode').value = 'color';
+    syncFillRows();
+  };
   $('#site-icon').onchange = event => {
     const file = event.target.files[0];
     if (!file) return;
@@ -110,7 +177,7 @@ export function editSite(item, list, isNew) {
     } else {
       item.url = normalizeUrl(url);
       if (pickedIcon) { item.icon = pickedIcon; item.wide = false; }
-      if (colorTouched) { item.bg = $('#site-color').value; item.dark = false; }
+      if (list !== S.pills) saveFill(item);
     }
     if (isNew) { item.id = uid(); list.push(item); }
     save();
