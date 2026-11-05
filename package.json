@@ -1,0 +1,16 @@
+{
+  "name": "tablo-newtab",
+  "version": "2.1.0",
+  "description": "Новая вкладка для Firefox: часы, поиск, плитки, папки и настраиваемый фон",
+  "private": true,
+  "license": "MIT",
+  "author": "Btw.kek",
+  "repository": { "type": "git", "url": "git+https://github.com/Btwkek/tablo-newtab.git" },
+  "scripts": {
+    "start": "web-ext run --source-dir src",
+    "lint": "web-ext lint --source-dir src",
+    "build": "web-ext build --source-dir src --artifacts-dir dist --overwrite-dest",
+    "sign": "web-ext sign --source-dir src --artifacts-dir dist --channel unlisted"
+  },
+  "devDependencies": { "web-ext": "^8.0.0" }
+}

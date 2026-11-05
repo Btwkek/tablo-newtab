@@ -1,0 +1,38 @@
+name: Release
+
+# Релиз создаётся при пуше тега вида v2.0.0.
+# Нужны секреты репозитория AMO_API_KEY и AMO_API_SECRET (см. docs/PUBLISHING.md).
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Версия в манифесте совпадает с тегом
+        run: test "v$(jq -r .version src/manifest.json)" = "${GITHUB_REF_NAME}"
+
+      - name: Проверка расширения
+        run: npx --yes web-ext@8 lint --source-dir src
+
+      - name: Подпись в Mozilla (самостоятельное распространение)
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_API_KEY }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_API_SECRET }}
+        run: npx --yes web-ext@8 sign --source-dir src --artifacts-dir dist --channel unlisted --approval-timeout 900000
+
+      - name: Публикация релиза
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.xpi
+          generate_release_notes: true

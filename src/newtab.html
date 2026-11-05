@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>New Tab</title>
+  <link rel="icon" id="favicon" href="data:,">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <div id="background"></div>
+  <button type="button" class="round-btn" id="menu-button" data-i18n-title="html.more" data-i18n-aria="html.more">⋯</button>
+
+  <main>
+    <div class="block" data-block="hero">
+      <button type="button" class="drag-handle" data-i18n-title="html.drag" data-i18n-aria="html.dragBlock">✥</button>
+      <section id="hero">
+        <div id="time"></div>
+        <div id="dateline"><span id="date"></span><span id="weather"></span></div>
+      </section>
+    </div>
+
+    <div class="block" data-block="search">
+      <button type="button" class="drag-handle" data-i18n-title="html.drag" data-i18n-aria="html.dragBlock">✥</button>
+      <div id="search">
+        <input id="search-input" data-i18n-placeholder="html.searchPlaceholder" spellcheck="false" autofocus>
+        <button type="button" id="search-image" data-i18n-title="html.searchImage" data-i18n-aria="html.searchImage">
+          <svg viewBox="0 -960 960 960" width="24" height="24" aria-hidden="true"><path d="M480-320q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35Zm240 160q-33 0-56.5-23.5T640-240q0-33 23.5-56.5T720-320q33 0 56.5 23.5T800-240q0 33-23.5 56.5T720-160Zm-440 40q-66 0-113-47t-47-113v-80h80v80q0 33 23.5 56.5T280-200h200v80H280Zm480-320v-160q0-33-23.5-56.5T680-680H280q-33 0-56.5 23.5T200-600v120h-80v-120q0-66 47-113t113-47h80l40-80h160l40 80h80q66 0 113 47t47 113v160h-80Z" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="block" data-block="pills">
+      <button type="button" class="drag-handle" data-i18n-title="html.drag" data-i18n-aria="html.dragBlock">✥</button>
+      <div id="pills"></div>
+    </div>
+
+    <div id="bookmark-prompt" hidden>
+      <span data-i18n="html.bookmarkPrompt"></span>
+      <button type="button" id="bookmark-allow" data-i18n="html.bookmarkAllow"></button>
+      <button type="button" id="bookmark-dismiss" data-i18n="html.bookmarkDismiss"></button>
+    </div>
+
+    <div class="block" data-block="grid">
+      <button type="button" class="drag-handle" data-i18n-title="html.drag" data-i18n-aria="html.dragBlock">✥</button>
+      <div id="grid" class="grid"></div>
+    </div>
+  </main>
+
+  <div id="snap-grid"></div>
+  <div id="widget-layer"></div>
+
+  <div id="edit-bar" hidden>
+    <span data-i18n="html.editHint"></span>
+    <button type="button" id="edit-reset" data-i18n="html.editReset"></button>
+    <button type="button" id="edit-done" class="primary" data-i18n="html.editDone"></button>
+  </div>
+
+  <div id="toast" hidden></div>
+
+  <div id="folder-overlay" hidden>
+    <div id="folder-panel">
+      <input id="folder-title" spellcheck="false" data-i18n-aria="html.folderName">
+      <div id="folder-grid" class="grid"></div>
+    </div>
+  </div>
+
+  <div id="context-menu" hidden></div>
+
+  <input type="file" id="background-file" accept="image/*" hidden>
+  <input type="file" id="import-file" accept="application/json" hidden>
+
+  <dialog id="site-dialog">
+    <h3 id="site-dialog-title"></h3>
+    <label><span data-i18n="html.siteName"></span> <input id="site-title"></label>
+    <div id="site-fields">
+      <label><span data-i18n="html.siteUrl"></span> <input id="site-url" placeholder="https://"></label>
+      <label><span data-i18n="html.siteColor"></span> <input type="color" id="site-color" value="#ffffff"></label>
+      <label><span data-i18n="html.siteIcon"></span> <input type="file" id="site-icon" accept="image/*"></label>
+    </div>
+    <div id="folder-fields">
+      <label><span data-i18n="html.folderBlur"></span> <input type="range" id="folder-blur" min="0" max="14" value="0"></label>
+    </div>
+    <div class="buttons">
+      <button type="button" id="site-cancel" data-i18n="html.cancel"></button>
+      <button type="button" id="site-save" class="primary" data-i18n="html.save"></button>
+    </div>
+  </dialog>
+
+  <aside id="settings"></aside>
+  <dialog id="modal"></dialog>
+</body>
+</html>

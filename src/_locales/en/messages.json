@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Tablo: Custom New Tab",
+    "description": "Extension name"
+  },
+  "extensionDescription": {
+    "message": "New tab page with a clock, search, tiles, folders and a customizable background.",
+    "description": "Extension description"
+  }
+}
